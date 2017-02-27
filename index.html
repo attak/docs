@@ -113,17 +113,41 @@
     <div class="page-wrapper">
       <div class="dark-box"></div>
       <div class="content">
-        <h1 id="introduction">Introduction</h1>
+        <h2 id="contents">Contents</h2>
+
+<ul>
+<li><a href="#introduction">Introduction</a>
+
+<ul>
+<li><a href="#distributed-topologies">Distributed Topologies</a></li>
+<li><a href="#why-attak">Why ATTAK</a></li>
+</ul></li>
+<li><a href="#quick-start">Quick Start</a></li>
+<li><a href="#components">Components</a>
+
+<ul>
+<li><a href="#topology">Topology</a></li>
+<li><a href="#processors">Processors</a></li>
+</ul></li>
+<li><a href="#debugging">Debugging</a>
+
+<ul>
+<li><a href="#topology-debugger">Topology Debugger</a></li>
+<li><a href="#cli-simulation">CLI Simulation</a></li>
+</ul></li>
+</ul>
+
+<h1 id="introduction"><a name="introduction"></a>Introduction</h1>
 
 <p>Welcome to attak! We aim to create the simplest and most powerful way to build high-scale distributed realtime computation topologies. We provide tools to assist in prototyping, development, deployment, and production monitoring.</p>
 
-<h2 id="a-distrubted-what">A Distrubted What?</h2>
+<h2 id="a-distrubted-what"><a name="distributed-topologies"></a>A Distrubted What?</h2>
 
 <p>When processing streaming data, it can often be useful to break tasks out into separate microservices. Those microservices usually need to send data to eachother, and good practice dictates some kind of fault-tolerant queue system is used.</p>
 
 <p>A topology is what we call everything together - the set of all data processing microservices (we call them &ldquo;processors&rdquo;) and data queues (&ldquo;streams&rdquo;).</p>
 
-<h2 id="why-use-attak">Why use ATTAK</h2>
+<h2 id="why-use-attak"><a name="why-attak"></a>Why use ATTAK</h2>
 
 <p>ATTAK has several advantages over existing frameworks like Apache Storm</p>
 
@@ -145,62 +169,53 @@
 
 <p>Auto-scaling components mean there are no servers to be juggled, no CPUs or disks to monitor, no logs to rotate, etc. Everything just works&hellip;and did we mention it&rsquo;s cheaper?</p>
 
-<h1 id="getting-started">Getting Started</h1>
+<h1 id="quick-start"><a name="quick-start"></a>Quick Start</h1>
 
-<h3 id="prerequisites">Prerequisites</h3>
+<h3 id="install-cli">Install cli</h3>
 
-<ul>
-<li><a href="https://nodejs.org/en/download/">node.js</a></li>
-</ul>
-
-<h2 id="installation">Installation</h2>
-<pre class="highlight plaintext"><code>npm install -g attak
-</code></pre>
 <p><code class="prettyprint">npm install -g attak</code></p>
 
-<h2 id="hello-world-topology">Hello World Topology</h2>
+<h3 id="create-an-attak-topology">Create an attak topology</h3>
 
-<p>We&rsquo;ve setup an extremely basic example of an ATTAK topology.</p>
+<p>Generate a simple boilerplate project by running:</p>
 
-<h3 id="create-new-project">Create new project</h3>
+<p><code class="prettyprint">attak init</code></p>
 
-<h2 id="motivation">Motivation</h2>
+<h3 id="setup-environment">Setup environment</h3>
 
-<p>Serverless functions are awesome because single-purpose microservices are a great way to organize code. However, real-world use cases often require multiple microservices, and communicating between them in a fault tolerant way takes some thought.</p>
+<p>Rename <code class="prettyprint">.env.example</code> to <code class="prettyprint">.env</code> and put in values as appropriate for your deploy. The required fields are:</p>
 
-<p>Existing solutions like Apache Storm use queues to stream data between functions, but require special hosting which can be expensive and cumbersome. They&rsquo;re also mostly focused on Java and JVM technologies.</p>
+<ul>
+<li><code class="prettyprint">AWS_ACCESS_KEY_ID</code></li>
+<li><code class="prettyprint">AWS_SECRET_ACCESS_KEY</code></li>
+<li><code class="prettyprint">AWS_ROLE_ARN</code></li>
+</ul>
 
-<p><strong>attak</strong> is built to combine existing, proven products (Lambdas, Kinesis Streams, Kubernetes, PubSub, etc.) to create a better solution using more modern technologies.</p>
+<h3 id="topology-simulation-and-debugging">Topology simulation and debugging</h3>
 
-<h2 id="why-use-attak">Why use <strong>attak</strong>?</h2>
+<p>Visit <a href="http://attak.io#local">the ATTAK ui</a> and run the simulation with the command displayed, which will look like:</p>
 
-<p><strong>attak</strong> has several advantages:</p>
+<p><code class="prettyprint">attak simulate -i [simulation id]</code></p>
 
-<p><strong><em>Speed and Simplicity</em></strong></p>
+<p>If you want to run the topology without the UI debugger, simply run</p>
 
-<p>It&rsquo;s just node (or whatever shell processes you want to call)</p>
+<p><code class="prettyprint">attak simulate</code> </p>
 
-<p>Running a local Storm topology can take several minutes (you have to compile an uber-jar and then boot up the JVM and all the bolt/spout processes). Simulating an <strong>attak</strong> topology takes seconds.</p>
+<h3 id="deploy-the-topology">Deploy the topology</h3>
 
-<p>Serverless functions and queuing systems have existing error handling solutions, so any existing debugging infrastructure will still work. For instance, logs from AWS Lambdas are automatically sent to CloudWatch, where they can be easly monitored.</p>
+<p>ATTAK will deploy all processors and streams in the topology.</p>
 
-<p><strong><em>Price</em></strong></p>
+<p><code class="prettyprint">attak deploy</code></p>
 
-<p>Apache Storm requires several dedicated servers to run. <a href="https://github.com/nathanmarz/storm-deploy">this popular example</a> uses 4 m1-large EC2 instances which costs something like $500/mo even when inactive.</p>
-
-<p><strong>attak</strong> uses auto-scaling building blocks, so it mostly sits idle when not in use. An inactive topology will likely cost under $10/mo, and will be significantly cheaper at scale also.</p>
-
-<p><strong><em>Maintenance</em></strong></p>
-
-<p>Auto-scaling components mean there are no servers to be juggled, no CPUs or disks to monitor, no logs to rotate, etc. Everything just works&hellip;and did we mention it&rsquo;s cheaper?</p>
-
-<h2 id="usage">Usage</h2>
+<h1 id="components"><a name="components"></a>Components</h1>
 
 <p>In order to get a topology running you need to build a topology file and define one or more processors.</p>
 
-<h3 id="topology-file">Topology file</h3>
+<h2 id="topology"><a name="topology"></a>Topology</h2>
 
-<p>An attak topology is simply a javascript or raw JSON file that we <code class="prettyprint">require</code>. At its core, a topology is a description of one or more processors and the connections between them. Here&rsquo;s an example of a very simple topology.</p>
+<p>An topology is simply a JSON structure that defines the features of your application. An ATTAK project is meant to be a node package, so we will <code class="prettyprint">require</code> the directory, and <code class="prettyprint">index.js</code> (or whatever is specified in <code class="prettyprint">package.json</code>) will be loaded.</p>
+
+<p>At its core, a topology is a description of one or more processors and the connections between them. Here&rsquo;s an example of a very simple topology.</p>
 <pre class="highlight javascript"><code><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
   <span class="na">name</span><span class="p">:</span> <span class="s1">'attak-example'</span><span class="p">,</span>                          <span class="c1">// a topology name is required</span>
   <span class="na">processors</span><span class="p">:</span> <span class="p">{</span>                                   <span class="c1">// declare processors</span>
@@ -215,7 +230,7 @@
   <span class="p">]</span>
 <span class="p">}</span>
 </code></pre>
-<h3 id="processors">Processors</h3>
+<h2 id="processors"><a name="processors"></a>Processors</h2>
 
 <p><strong>attak</strong> has a single concept for all data processing units: processors. In the abstract a processor is triggered in response to some event. The processor can access event data if any, and can emit any number of new events. Here&rsquo;s an example processor:</p>
 <pre class="highlight javascript"><code><span class="nx">exports</span><span class="p">.</span><span class="nx">handler</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
@@ -225,7 +240,27 @@
   <span class="nx">callback</span><span class="p">()</span>                                      <span class="c1">// close up shop</span>
 <span class="p">}</span>
 </code></pre>
-<h3 id="simulate-a-topology">Simulate a topology</h3>
+<h1 id="debugging"><a name="debugging"></a>Debugging</h1>
+
+<p>ATTAK provides a number of tools</p>
+
+<h2 id="topology-debugger"><a name="topology-debugger"></a>Topology Debugger</h2>
+
+<p>Complex problems require complex solutions, and debugging interaction between distributed components can be extremely difficult without assistance. ATTAK&rsquo;s Topology Debugger is a web tool that help you build and debug your topologies during simulation. It&rsquo;s free to use for everyone.</p>
+
+<p>To use it, visit <a href="http://attak.io#local">the local simulator</a>. You&rsquo;ll see something like this:</p>
+
+<p><a href="http://attak.io#local"><img src="http://attak.s3.amazonaws.com/local_start.png" alt="Debugger ID callout" /></a></p>
+
+<p>Running the command from within a project directory will send topology information to the page via local <a href="https://webrtc.org/">WebRTC</a> connection. The debugger will display your topology as a graph, and then run the simulation.</p>
+
+<p><a href="http://attak.io#local"><img src="http://attak.s3.amazonaws.com/graph.png" alt="Topology graph example" /></a></p>
+
+<p>Events emitted during the simulation will be displayed on the debugger in real time. This topology graph shows a processor called <code class="prettyprint">github_events</code> which has emitted more events than other processors.</p>
+
+<p>The topology debugger is still under heavy development so the specific set of functionality will be documented as it&rsquo;s solidified.</p>
+
+<h2 id="cli-simulation"><a name="cli-simulation"></a>CLI Simulation</h2>
 
 <p><code class="prettyprint">attak simulate</code></p>
 
@@ -235,19 +270,21 @@
     </span><span class="nt">"other_processor"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string data is fine"</span><span class="p">,</span><span class="w">
 </span><span class="err">}</span><span class="w">
 </span></code></pre>
-<h3 id="deploy-a-topology">Deploy a topology</h3>
+<p>Any events emitted from processors will be displayed in blue, and processor console logs will work as normal.</p>
+
+<h2 id="deploy-a-topology">Deploy a topology</h2>
 
 <p><code class="prettyprint">attak deploy</code></p>
 
 <p>Assembles and deploys a series of functions pre-baked with topology information, so event emissions go directly from function to stream to function.</p>
 
-<h3 id="trigger-a-live-topology">Trigger a live topology</h3>
+<h2 id="trigger-a-live-topology">Trigger a live topology</h2>
 
 <p><code class="prettyprint">attak trigger</code></p>
 
 <p>Pulls in data (from <code class="prettyprint">./input.json</code> by default) and sends it to a live topology instance</p>
 
-<h3 id="roadmap">Roadmap</h3>
+<h1 id="roadmap">Roadmap</h1>
 
 <h4 id="features">Features</h4>
 
