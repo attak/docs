@@ -7,17 +7,30 @@ toc_footers:
 search: true
 ---
 
-# Introduction
+## Contents
+
+* [Introduction](#introduction)
+  * [Distributed Topologies](#distributed-topologies)
+  * [Why ATTAK](#why-attak)
+* [Quick Start](#quick-start)
+* [Components](#components)
+  * [Topology](#topology)
+  * [Processors](#processors)
+* [Debugging](#debugging)
+  * [Topology Debugger](#topology-debugger)
+  * [CLI Simulation](#cli-simulation)
+
+# <a name="introduction"></a>Introduction
 
 Welcome to attak! We aim to create the simplest and most powerful way to build high-scale distributed realtime computation topologies. We provide tools to assist in prototyping, development, deployment, and production monitoring.
 
-## A Distrubted What?
+## <a name="distributed-topologies"></a>A Distrubted What?
 
 When processing streaming data, it can often be useful to break tasks out into separate microservices. Those microservices usually need to send data to eachother, and good practice dictates some kind of fault-tolerant queue system is used.
 
 A topology is what we call everything together - the set of all data processing microservices (we call them "processors") and data queues ("streams").
 
-## Why use ATTAK
+## <a name="why-attak"></a>Why use ATTAK
 
 ATTAK has several advantages over existing frameworks like Apache Storm
 
@@ -39,62 +52,51 @@ ATTAK's auto-scaling building blocks are pay-per-request, so idle topologies cos
 
 Auto-scaling components mean there are no servers to be juggled, no CPUs or disks to monitor, no logs to rotate, etc. Everything just works...and did we mention it's cheaper?
 
-# Getting Started
+# <a name="quick-start"></a>Quick Start
 
-### Prerequisites
+### Install cli
 
-- [node.js](https://nodejs.org/en/download/)
-
-## Installation
-
-```
-npm install -g attak
-```
 `npm install -g attak`
 
-## Hello World Topology
+### Create an attak topology
 
-We've setup an extremely basic example of an ATTAK topology.
+Generate a simple boilerplate project by running:
 
-### Create new project
+`attak init`
 
-## Motivation
+### Setup environment
 
-Serverless functions are awesome because single-purpose microservices are a great way to organize code. However, real-world use cases often require multiple microservices, and communicating between them in a fault tolerant way takes some thought.
+Rename `.env.example` to `.env` and put in values as appropriate for your deploy. The required fields are:
 
-Existing solutions like Apache Storm use queues to stream data between functions, but require special hosting which can be expensive and cumbersome. They're also mostly focused on Java and JVM technologies.
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `AWS_ROLE_ARN`
 
-**attak** is built to combine existing, proven products (Lambdas, Kinesis Streams, Kubernetes, PubSub, etc.) to create a better solution using more modern technologies.
+### Topology simulation and debugging
 
-## Why use **attak**?
+Visit [the ATTAK ui](http://attak.io#local) and run the simulation with the command displayed, which will look like:
 
-**attak** has several advantages:
+`attak simulate -i [simulation id]`
 
-***Speed and Simplicity***
+If you want to run the topology without the UI debugger, simply run
 
-It's just node (or whatever shell processes you want to call)
+`attak simulate` 
 
-Running a local Storm topology can take several minutes (you have to compile an uber-jar and then boot up the JVM and all the bolt/spout processes). Simulating an **attak** topology takes seconds.
+### Deploy the topology
 
-Serverless functions and queuing systems have existing error handling solutions, so any existing debugging infrastructure will still work. For instance, logs from AWS Lambdas are automatically sent to CloudWatch, where they can be easly monitored.
+ATTAK will deploy all processors and streams in the topology.
 
-***Price***
+```attak deploy```
 
-Apache Storm requires several dedicated servers to run. [this popular example](https://github.com/nathanmarz/storm-deploy) uses 4 m1-large EC2 instances which costs something like $500/mo even when inactive.
-
-**attak** uses auto-scaling building blocks, so it mostly sits idle when not in use. An inactive topology will likely cost under $10/mo, and will be significantly cheaper at scale also.
-
-***Maintenance***
-
-Auto-scaling components mean there are no servers to be juggled, no CPUs or disks to monitor, no logs to rotate, etc. Everything just works...and did we mention it's cheaper?
-
-## Usage
+# <a name="components"></a>Components
 
 In order to get a topology running you need to build a topology file and define one or more processors.
 
-### Topology file
+## <a name="topology"></a>Topology
 
-An attak topology is simply a javascript or raw JSON file that we `require`. At its core, a topology is a description of one or more processors and the connections between them. Here's an example of a very simple topology.
+An topology is simply a JSON structure that defines the features of your application. An ATTAK project is meant to be a node package, so we will `require` the directory, and `index.js` (or whatever is specified in `package.json`) will be loaded.
+
+At its core, a topology is a description of one or more processors and the connections between them. Here's an example of a very simple topology.
 
 ```js
 module.exports = {
@@ -112,7 +114,7 @@ module.exports = {
 }
 ```
 
-### Processors
+## <a name="processors"></a>Processors
 
 **attak** has a single concept for all data processing units: processors. In the abstract a processor is triggered in response to some event. The processor can access event data if any, and can emit any number of new events. Here's an example processor:
 
@@ -125,7 +127,27 @@ exports.handler = function(event, context, callback) {
 }
 ```
 
-### Simulate a topology
+# <a name="debugging"></a>Debugging
+
+ATTAK provides a number of tools
+
+## <a name="topology-debugger"></a>Topology Debugger
+
+Complex problems require complex solutions, and debugging interaction between distributed components can be extremely difficult without assistance. ATTAK's Topology Debugger is a web tool that help you build and debug your topologies during simulation. It's free to use for everyone.
+
+To use it, visit [the local simulator](http://attak.io#local). You'll see something like this:
+
+[![Debugger ID callout](http://attak.s3.amazonaws.com/local_start.png)](http://attak.io#local)
+
+Running the command from within a project directory will send topology information to the page via local [WebRTC](https://webrtc.org/) connection. The debugger will display your topology as a graph, and then run the simulation.
+
+[![Topology graph example](http://attak.s3.amazonaws.com/graph.png)](http://attak.io#local)
+
+Events emitted during the simulation will be displayed on the debugger in real time. This topology graph shows a processor called `github_events` which has emitted more events than other processors.
+
+The topology debugger is still under heavy development so the specific set of functionality will be documented as it's solidified.
+
+## <a name="cli-simulation"></a>CLI Simulation
 
 `attak simulate`
 
@@ -138,19 +160,21 @@ Simulate pulls in data (from `./input.json` by default) and feeds it through the
 }
 ```
 
-### Deploy a topology
+Any events emitted from processors will be displayed in blue, and processor console logs will work as normal.
+
+## Deploy a topology
 
 `attak deploy`
 
 Assembles and deploys a series of functions pre-baked with topology information, so event emissions go directly from function to stream to function.
 
-### Trigger a live topology
+## Trigger a live topology
 
 `attak trigger`
 
 Pulls in data (from `./input.json` by default) and sends it to a live topology instance
 
-### Roadmap
+# Roadmap
 
 #### Features
 
